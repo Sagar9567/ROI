@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoicing ROI Simulator</title>
+    <style>
+        /* --- New CSS for a Modern Dark Mode UI --- */
+
+/* Import a professional font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* --- General & Fonts --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #1a1a2e; /* Dark blue background */
+    color: #e0e0e0; /* Light text color */
+}
+
+h1, h2 {
+    color: #ffffff;
+    font-weight: 600;
+    border-bottom: 2px solid #4a4a8a;
+    padding-bottom: 10px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+/* --- Card Layout --- */
+.container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.form-section, .results-section, .actions-section {
+    flex: 1;
+    background: #1e1e3f; /* Slightly lighter card background */
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #4a4a8a;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Form Elements (Inputs & Labels) --- */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 400;
+    color: #b0b0d0;
+}
+
+input, select {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: 1px solid #4a4a8a;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 1em;
+    font-family: 'Poppins', sans-serif;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #7a7afc;
+    box-shadow: 0 0 10px rgba(122, 122, 252, 0.5);
+}
+
+/* --- Buttons --- */
+button {
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 25px;
+    margin-right: 10px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background-image: linear-gradient(to right, #5a5afb, #7a7afc);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(122, 122, 252, 0.4);
+}
+
+.secondary-button { background-image: linear-gradient(to right, #00b09b, #96c93d); }
+.secondary-button:hover { box-shadow: 0 4px 15px rgba(0, 176, 155, 0.4); }
+
+.tertiary-button { background-image: linear-gradient(to right, #ffc107, #ff9800); color: black; }
+.tertiary-button:hover { box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
+
+.danger-button { background-image: linear-gradient(to right, #f5567b, #fd6e6a); }
+.danger-button:hover { box-shadow: 0 4px 15px rgba(245, 86, 123, 0.4); }
+
+/* --- Results Display --- */
+.result-item {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #b0b0d0;
+}
+
+.result-item span {
+    font-weight: 600;
+    font-size: 1.4em;
+    color: #00f2ea; /* Bright teal for results */
+    display: block;
+    margin-top: 5px;
+}
+    </style>
+</head>
+<body>
+
+    <h1>Invoicing ROI Simulator 🎯</h1>
+    <div class="container">
+        <div class="form-section">
+            <h2>Enter Your Business Metrics</h2>
+            <form id="roi-form">
+                <label for="monthly_invoice_volume">Invoices Processed Per Month</label>
+                <input type="number" id="monthly_invoice_volume" value="2000" required>
+                <label for="num_ap_staff">Staff Managing Invoicing</label>
+                <input type="number" id="num_ap_staff" value="3" required>
+                <label for="avg_hours_per_invoice">Manual Hours Per Invoice (e.g., 0.17 for 10 mins)</label>
+                <input type="number" step="0.01" id="avg_hours_per_invoice" value="0.17" required>
+                <label for="hourly_wage">Average Cost Per Hour ($)</label>
+                <input type="number" id="hourly_wage" value="30" required>
+                <label for="error_rate_manual">Manual Error Rate (%)</label>
+                <input type="number" step="0.1" id="error_rate_manual" value="0.5" required>
+                <label for="error_cost">Cost to Fix Each Error ($)</label>
+                <input type="number" id="error_cost" value="100" required>
+                <label for="time_horizon_months">Projection Period (Months)</label>
+                <input type="number" id="time_horizon_months" value="36" required>
+                <label for="one_time_implementation_cost">(Optional) Setup Cost ($)</label>
+                <input type="number" id="one_time_implementation_cost" value="50000">
+                <button type="submit">Calculate ROI</button>
+            </form>
+        </div>
+        <div class="results-section">
+            <h2>Your Projected Savings</h2>
+            <div class="result-item">Monthly Savings: <span id="monthly-savings-result">$0</span></div>
+            <div class="result-item">Payback Period: <span id="payback-months-result">N/A</span></div>
+            <div class="result-item">Total Net Savings (36 months): <span id="net-savings-result">$0</span></div>
+            <div class="result-item">ROI Percentage (36 months): <span id="roi-percentage-result">0%</span></div>
+        </div>
+    </div>
+
+    <div class="actions-section">
+        <h2>Actions</h2>
+        
+        <div>
+            <label for="scenario-list">Load Saved Scenario</label>
+            <select id="scenario-list">
+                <option value="">-- Select a scenario --</option>
+            </select>
+            <button id="load-scenario-btn" class="tertiary-button">Load Scenario</button>
+            <button id="delete-scenario-btn" class="danger-button">Delete Scenario</button> </div>
+        <hr style="margin: 20px 0;">
+        
+        <div>
+            <label for="scenario_name">Save Current as New Scenario</label>
+            <input type="text" id="scenario_name" placeholder="e.g., Q4_Pilot">
+            <button id="save-scenario-btn">Save Scenario</button>
+        </div>
+        <hr style="margin: 20px 0;">
+        <div>
+            <label for="user_email">Your Email for Report</label>
+            <input type="email" id="user_email" placeholder="name@example.com">
+            <button id="generate-report-btn" class="secondary-button">Download Report</button>
+        </div>
+    </div>
+
+    <script>
+        let latestResults = {};
+        function getFormData() { /* Unchanged */
+            return {
+                monthly_invoice_volume: document.getElementById('monthly_invoice_volume').value, num_ap_staff: document.getElementById('num_ap_staff').value, avg_hours_per_invoice: document.getElementById('avg_hours_per_invoice').value, hourly_wage: document.getElementById('hourly_wage').value, error_rate_manual: document.getElementById('error_rate_manual').value, error_cost: document.getElementById('error_cost').value, time_horizon_months: document.getElementById('time_horizon_months').value, one_time_implementation_cost: document.getElementById('one_time_implementation_cost').value
+            };
+        }
+        document.getElementById('roi-form').addEventListener('submit', async function(event) { /* Unchanged */
+            event.preventDefault();
+            const data = getFormData();
+            try {
+                const response = await fetch('http://127.0.0.1:5000/simulate', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const results = await response.json();
+                latestResults = results;
+                document.getElementById('monthly-savings-result').textContent = `$${results.monthly_savings.toLocaleString()}`;
+                document.getElementById('payback-months-result').textContent = `${results.payback_months} months`;
+                document.getElementById('net-savings-result').textContent = `$${results.net_savings.toLocaleString()}`;
+                document.getElementById('roi-percentage-result').textContent = `${results.roi_percentage}%`;
+            } catch (error) { console.error("Error calculating ROI:", error); alert("Could not calculate ROI. Please check if the server is running."); }
+        });
+        document.getElementById('save-scenario-btn').addEventListener('click', async function() { /* Unchanged */
+            const scenarioName = document.getElementById('scenario_name').value;
+            if (!scenarioName) { alert("Please enter a name for the scenario."); return; }
+            const data = { ...getFormData(), scenario_name: scenarioName };
+            try {
+                const response = await fetch('http://127.0.0.1:5000/scenarios', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                const result = await response.json();
+                alert(result.message);
+                loadScenarioList();
+            } catch (error) { alert("Failed to save scenario."); }
+        });
+        document.getElementById('generate-report-btn').addEventListener('click', async function() { /* Unchanged */
+            const email = document.getElementById('user_email').value;
+            if (!email) { alert("Please enter your email to generate the report."); return; }
+            if (Object.keys(latestResults).length === 0) { alert("Please calculate ROI first before generating a report."); return; }
+            const data = { email: email, results: latestResults };
+            try {
+                const response = await fetch('http://127.0.0.1:5000/report/generate', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+                const reportHtml = await response.text();
+                const reportWindow = window.open();
+                reportWindow.document.write(reportHtml);
+                reportWindow.document.close();
+            } catch (error) { alert("Failed to generate report."); }
+        });
+
+        const scenarioList = document.getElementById('scenario-list');
+        async function loadScenarioList() { /* Unchanged */
+            try {
+                const response = await fetch('http://127.0.0.1:5000/scenarios');
+                const scenarios = await response.json();
+                scenarioList.innerHTML = '<option value="">-- Select a scenario --</option>';
+                scenarios.forEach(scenario => {
+                    const option = document.createElement('option');
+                    option.value = scenario.id;
+                    option.textContent = scenario.scenario_name;
+                    scenarioList.appendChild(option);
+                });
+            } catch (error) { console.error('Failed to load scenario list:', error); }
+        }
+        document.getElementById('load-scenario-btn').addEventListener('click', async function() { /* Unchanged */
+            const scenarioId = scenarioList.value;
+            if (!scenarioId) { alert('Please select a scenario to load.'); return; }
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/scenarios/${scenarioId}`);
+                const scenario = await response.json();
+                document.getElementById('monthly_invoice_volume').value = scenario.monthly_invoice_volume;
+                document.getElementById('num_ap_staff').value = scenario.num_ap_staff;
+                document.getElementById('avg_hours_per_invoice').value = scenario.avg_hours_per_invoice;
+                document.getElementById('hourly_wage').value = scenario.hourly_wage;
+                document.getElementById('error_rate_manual').value = scenario.error_rate_manual;
+                document.getElementById('error_cost').value = scenario.error_cost;
+                document.getElementById('time_horizon_months').value = scenario.time_horizon_months;
+                document.getElementById('one_time_implementation_cost').value = scenario.one_time_implementation_cost;
+                document.getElementById('scenario_name').value = scenario.scenario_name;
+                alert(`Scenario "${scenario.scenario_name}" loaded!`);
+            } catch (error) { console.error('Failed to load scenario:', error); alert('Could not load the selected scenario.'); }
+        });
+        
+        // ▼▼▼ NEW JAVASCRIPT ▼▼▼
+        document.getElementById('delete-scenario-btn').addEventListener('click', async function() {
+            const scenarioId = scenarioList.value;
+            if (!scenarioId) {
+                alert('Please select a scenario to delete.');
+                return;
+            }
+
+            // Ask for confirmation before deleting
+            const selectedOption = scenarioList.options[scenarioList.selectedIndex];
+            if (confirm(`Are you sure you want to delete the scenario "${selectedOption.textContent}"?`)) {
+                try {
+                    const response = await fetch(`http://127.0.0.1:5000/scenarios/${scenarioId}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    alert(result.message);
+                    loadScenarioList(); // Refresh the list after deleting
+                } catch (error) {
+                    console.error('Failed to delete scenario:', error);
+                    alert('Could not delete the selected scenario.');
+                }
+            }
+        });
+        // ▲▲▲ END NEW JAVASCRIPT ▲▲▲
+
+        window.addEventListener('DOMContentLoaded', loadScenarioList);
+    </script>
+</body>
+</html>
